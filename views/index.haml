@@ -1,0 +1,68 @@
+!!!
+%html
+  %head
+    %script{:type => 'text/javascript', :src => 'http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js'}
+    %script{:type => 'text/javascript', :src => '/scripts/sammy.js'}
+    %script{:type => 'text/javascript', :src => '/scripts/jquery.autocomplete.js'}
+    %script{:type => 'text/javascript', :src => '/scripts/jquery.expandable.js'}
+    %script{:type => 'text/javascript', :src => '/scripts/jquery.hotkeys/jquery.hotkeys.js'}
+    %script{:type => 'text/javascript', :src => '/scripts/screen.js'}
+    %link{:rel => 'stylesheet', :type => 'text/css', :media => 'screen', :href => '/css/screen.css'}
+    %link{:rel => 'stylesheet', :type => 'text/css', :media => 'screen', :href => '/css/jquery.autocomplete.css'}
+    %title Noteynote - note taking and categorization at the tip of your fingers
+
+  %body
+    #center_column
+      #header
+        = render_login_logout(:rel => 'modal')
+        %h1.title noteynote
+      - if logged_in?
+        #instructions
+          %a{:href => '/instructions', :rel => 'modal'} Getting started
+        #form_container
+          #main-loading-container
+            - if logged_in?
+              .loading
+                Loading
+                %img{:src => 'images/ajax-loader.gif', :class => 'loading-image'}
+          -#this needs to be replaced with a sammy form
+          %form{:method => 'post', :action => '/notes', :id => 'note-form'}
+            %textarea{'name' => 'note[body]', :id => 'query'}
+            #bottom-buttons
+              %input{:type => 'submit', :value => 'search', :id => 'search'}
+              %input{:type => 'button', :value => 'post', :id => 'post'}
+              %a{:href => '/', :id => 'view_all'} view all
+              #edit-cancel
+              #edit-pk
+        -# #preview_pane
+        #rightbar
+          %a{:href => '/', :id => 'view_all'} view all
+          #tags
+            %ul
+              - @tags.each do |tag|
+                %li
+                  %a{:class => 'delete tag-delete', :href => "/tags/#{tag[:pk]}/delete"}
+                  %a{:class => 'tag color-' + (totalFromCharcodes(tag['tag']) % 7).to_s, :href => "#/notes/#{tag['tag']}"}=tag['tag']
+        #results
+      - else
+        .promo
+          %p
+            Noteynote is the quickest way to make and categorize notes about anything.
+          %h3.tagline Think Tw!tt3r, except personal.
+          %img{:src => '/images/noteynotepreview.png', :class => 'preview-image'}
+    #modalbox
+      #content
+      .loading
+        Loading
+        %img{:src => 'images/ajax-loader.gif', :class => 'loading-image'}
+    -# analytics
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+    var pageTracker = _gat._getTracker("UA-8480122-2");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+
