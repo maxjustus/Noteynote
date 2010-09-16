@@ -156,7 +156,19 @@ $(document).ready(function() {
       function(data) {
         $('#main-loading-container').hide();
         var value = $('#query').val();
-        app.runRoute('get', '#/notes/' + value);
+        //app.runRoute('get', '#/notes/' + value);
+        $('#main-loading-container').show();
+        $.ajax({
+          /* /notes doesn't repopulate the tag bar, it should if the data is available */
+          dataType: 'json',
+          url: '/notes',
+          data: {'q': value},
+          async: false,
+          success: function(data){
+            /* this stuff doesn't belong here... */
+            build_list(data);
+          }
+        });
       }
     );
     return false;
