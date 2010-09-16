@@ -55,6 +55,7 @@ li {
 
 #results li .created_at {
   color: #666;
+  font-size: 11px;
 }
 
 #instructions {
@@ -100,56 +101,73 @@ li {
   margin-top: 8px;
 }
 
-li .delete {
-  display: none;
-  background: white;
-  background-repeat: no-repeat;
-  background: url('/images/delete.png') no-repeat;
+li .delete, li .edit, li .archive {
+  /*display: none;*/
+  background-color: white;
   height: 16px;
   width: 16px;
+  float: right;
+  /*clear: right;
+  border-left: 1px solid #aaa;
+  */
+  padding: 2px 0px 0px 4px;
+  background-position: 2px 0px !important;
+  background-repeat: no-repeat !important;
+}
+
+li .archive {
+  background: url('/images/drawer.png') no-repeat;
+}
+
+li .edit {
+  background: url('/images/pencil.png');
+}
+
+li .delete {
+  background: url('/images/delete.png') no-repeat;
+}
+
+#archive li .archive {
+  background: url('/images/arrow_undo.png') no-repeat;
+}
+
+#archive li.toggle {
+  text-align: right;
+  content: 'Archived';
+  font-weight: bold;
+  font-size: 13px;
+  text-decoration: underline;
+  border-top: none;
+}
+
+#archive {
+  margin-top: 30px;
+  opacity: .5;
+}
+
+#archive:hover {
+  opacity: 1;
 }
 
 #results li .options {
   position: absolute;
-  right: -23px;
+  right: 0px;
   top: 4px;
-  width: 48px;
-  background: url('/images/cog.png') no-repeat 10px 0;
+  width: 90px;
+  /*background: url('/images/cog.png') no-repeat 10px 0;*/
   display: none;
   height: 100%;
   cursor: pointer;
 }
 
-#results li .delete {
-  float: right;
-  clear: both;
-  border-left: 1px solid #aaa;
-  background-position: 2px 0px;
-  padding: 2px 0px 0px 2px;
-}
-
 #tags li .delete {
+  display: none;
   position: absolute;
   right: 0px;
 }
 
 #tags li:hover .delete {
   display: block;
-}
-
-li .edit {
-  top: 22px;
-  display: none;
-  float: right;
-  clear: both;
-  background: white;
-  background: url('/images/pencil.png');
-  background-repeat: no-repeat;
-  height: 16px;
-  width: 16px;
-  border-left: 1px solid #aaa;
-  background-position: 2px 0px;
-  padding: 2px 0px 0px 2px;
 }
 
 #form_container {

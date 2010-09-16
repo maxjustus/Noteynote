@@ -88,39 +88,39 @@ get '/' do
 end
 
 post '/notes' do
+  login_required
   ##twitter posts update to twitter? #facebook posts to facebook? Only if I add that crap to sinatra-auth
-  if logged_in?
-    #I wish qgram worked.... :(
-    tag_regexp = /(^#[^ ]*)| (#[^ ]*)/
-    tags = params[:note][:body].scan(tag_regexp)
-    #note_body = params[:note][:body]
-    note_body = CGI.escapeHTML(params[:note][:body])
-    note_body.gsub!(/(\n)/, '\1 ')
+  #I wish qgram worked.... :(
+  tag_regexp = /(^#[^ ]*)| (#[^ ]*)/
+  tags = params[:note][:body].scan(tag_regexp)
+  #note_body = params[:note][:body]
+  note_body = CGI.escapeHTML(params[:note][:body])
+  note_body.gsub!(/(\n)/, '\1 ')
 
-    note_connection = Note.new
-    note_pk = params[:note][:pk] ? params[:note][:pk].to_s : note_connection.genuid.to_s
-    note = note_connection[note_pk] = {'body' => note_body, 'user_pk' => current_user[:pk]}
-    note.merge!({'pk' => note_pk})
-    note_connection.close
+  note_connection = Note.new
+  note_pk = params[:note][:pk] ? params[:note][:pk].to_s : note_connection.genuid.to_s
+  note = note_connection[note_pk] = {'body' => note_body, 'user_pk' => current_user[:pk]}
+  note.merge!({'pk' => note_pk})
+  note_connection.close
 
-    tag_connection = Tag.new
-    tags.each do |tag|
-      tag_connection.find_or_create_by_tag_and_owner(tag, current_user[:pk])
-    end
-    query_tags = tag_connection.query do |q|
-      q.add 'user_pk', :numeq, current_user[:pk]
-      q.order_by 'created_at_i', :numdesc
-      q.limit 50
-    end
-
-    tag_connection.close
-
-    {'tags' => query_tags, 'note' => note}.to_json
+  tag_connection = Tag.new
+  tags.each do |tag|
+    tag_connection.find_or_create_by_tag_and_owner(tag, current_user[:pk])
   end
+  query_tags = tag_connection.query do |q|
+    q.add 'user_pk', :numeq, current_user[:pk]
+    q.order_by 'created_at_i', :numdesc
+    q.limit 50
+  end
+
+  tag_connection.close
+
+  {'tags' => query_tags, 'note' => note}.to_json
 end
 
 get '/notes' do
   content_type :json
+  login_required
 
   note_connection = Note.new
 
@@ -156,6 +156,8 @@ get '/notes' do
 end
 
 get '/notes/:note_pk/delete' do
+  login_required
+
   note_connection = Note.new
 
   success = note_connection.delete(params[:note_pk])
@@ -165,7 +167,35 @@ get '/notes/:note_pk/delete' do
   !!success
 end
 
+get '/notes/:note_pk/move' do
+  login_required
+
+  note_connection = Note.new
+
+  note = note_connection[params[:note_pk]]
+  #if params[:value]
+  #  move = params[:value].to_i
+  #else
+  #  move = -1
+  #end
+  #plus or minus zero for now. So it can only be 1 0 or -1
+  if note['position'].to_i >= 0
+    note['position'] = -1
+  else
+    note['position'] = 0
+  end
+  puts note['position']
+
+  success = note_connection[params[:note_pk]] = note
+
+  note_connection.close
+
+  !!success
+end
+
 get '/tags' do
+  login_required
+
   tag_connection = Tag.new
   tags = tag_connection.query do |q|
     q.add 'user_pk', :numeq, current_user[:pk]
@@ -179,6 +209,8 @@ get '/tags' do
 end
 
 get '/tags/:tag_pk/delete' do
+  login_required
+
   tag_connection = Tag.new
 
   success = tag_connection.delete(params[:tag_pk])

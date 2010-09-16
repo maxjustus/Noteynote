@@ -36,22 +36,35 @@ var app = $.sammy(function() { with(this) {
     });
   }});
 }});
-  
+
 function build_list(data) {
   $('#main-loading-container').hide();
   var results_output = '<ul>';
+  var archive_output = '<ul id="archive"><li class="toggle">Archived</li>';
+  var archive_note_output = '';
   notes = data.notes;
   $.each(notes, function() {
-    results_output += '<li>';
-    results_output += '<input type="hidden" class="note_pk" value="' + this.pk + '" />';
-    results_output += '<div class="options">';
-    results_output += '<a class="edit" href="/notes" ></a>';
-    results_output += '<a class="delete" href="/notes/' + this.pk + '/delete" ></a>';
-    results_output += '</div>';
-    results_output += '<span class="text">' + parse_text(this.body) + '</span>' + ' <span class="created_at">' + prettyDate(this.created_at) +'</span>' + '</li>';
+    note_output = ''
+    note_output += '<li>';
+    note_output += '<input type="hidden" class="note_pk" value="' + this.pk + '" />';
+    note_output += '<div class="options">';
+    note_output += '<a class="delete" href="/notes/' + this.pk + '/delete" ></a>';
+    note_output += '<a class="edit" href="/notes" ></a>';
+    note_output += '<a class="archive" href="/notes/' + this.pk + '/move" ></a>';
+    note_output += '</div>';
+    note_output += '<span class="text">' + parse_text(this.body) + '</span>' + ' <span class="created_at">' + prettyDate(this.created_at) +'</span>' + '</li>';
+    if(this.position == 0 || this.position == undefined) {
+      results_output += note_output;
+    } else {
+      archive_note_output += note_output;
+    }
   });
   results_output += '</ul>';
   $('#results').html(results_output);
+  if(archive_note_output != '') {
+    archive_output += archive_note_output + '</ul>';
+    $('#results').append(archive_output);
+  }
 
   $('#results li').hover(function(){
     $(this).children('.options').show();
@@ -60,14 +73,14 @@ function build_list(data) {
     $(this).children('.options').hide();
   });
 
-  $('#results li .options').toggle(function(){
+  /*$('#results li .options').toggle(function(){
     $(this).children().show(100);
     return true;
   },
   function(){
     $(this).children().hide(100);
     return true;
-  });
+  });*/
 }
 
 function build_tag_list(data) {
@@ -115,6 +128,26 @@ $(document).ready(function() {
   $('#query').expandable({duration: 0, interval: 100});
 
   $('.delete').live('click', function(){
+    if(confirm('Are you sure?')) {
+      $('#main-loading-container').show();
+      element = this;
+      $.get(
+        $(this).attr('href'),
+        {},
+        function(data) {
+          $('#main-loading-container').hide();
+          if ($(element).hasClass('tag-delete')) {
+            $(element).parent().remove();
+          } else {
+            $(element).parent().parent().remove();
+          }
+        }
+      );
+    }
+    return false;
+  });
+
+  $('.archive').live('click', function(){
     $('#main-loading-container').show();
     element = this;
     $.get(
@@ -122,11 +155,8 @@ $(document).ready(function() {
       {},
       function(data) {
         $('#main-loading-container').hide();
-        if ($(element).hasClass('tag-delete')) {
-          $(element).parent().remove();
-        } else {
-          $(element).parent().parent().remove();
-        }
+        var value = $('#query').val();
+        app.runRoute('get', '#/notes/' + value);
       }
     );
     return false;
