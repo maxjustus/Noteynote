@@ -39,7 +39,7 @@ var app = $.sammy(function() { with(this) {
 
 function build_list(data) {
   $('#main-loading-container').hide();
-  var results_output = '<ul>';
+  var results_output = '<ul id="current">';
   var archive_output = '<ul id="archive"><li class="toggle">Archived</li>';
   var archive_note_output = '';
   notes = data.notes;
@@ -61,10 +61,10 @@ function build_list(data) {
   });
   results_output += '</ul>';
   $('#results').html(results_output);
-  if(archive_note_output != '') {
-    archive_output += archive_note_output + '</ul>';
-    $('#results').append(archive_output);
-  }
+  //if(archive_note_output != '') {
+  archive_output += archive_note_output + '</ul>';
+  $('#results').append(archive_output);
+  //}
 
   $('#results li').hover(function(){
     $(this).children('.options').show();
@@ -149,7 +149,7 @@ $(document).ready(function() {
 
   $('.archive').live('click', function(){
     $('#main-loading-container').show();
-    element = this;
+    var link = this;
     $.get(
       $(this).attr('href'),
       {},
@@ -157,18 +157,14 @@ $(document).ready(function() {
         $('#main-loading-container').hide();
         var value = $('#query').val();
         //app.runRoute('get', '#/notes/' + value);
-        $('#main-loading-container').show();
-        $.ajax({
-          /* /notes doesn't repopulate the tag bar, it should if the data is available */
-          dataType: 'json',
-          url: '/notes',
-          data: {'q': value},
-          async: false,
-          success: function(data){
-            /* this stuff doesn't belong here... */
-            build_list(data);
-          }
-        });
+        //$('#main-loading-container').show();
+        var note = $(link).closest('li');
+        $(note).find('.created_at').html('just now');
+        if ($(note).closest('#archive').length == 1) {
+          $('#current').prepend(note);
+        } else {
+          $('#archive .toggle').after(note);
+        }
       }
     );
     return false;
