@@ -39,12 +39,20 @@ li {
 
 #results {
   width: 700px;
+  margin-top: 10px;
 }
 
 #results li {
-  padding: 10px;
-  margin: 3px;
-  border-top: 1px dashed #999;
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+#results li:hover {
+  background: #f8f8f8;
+}
+
+#results li.toggle:hover {
+  background: #fff;
 }
 
 #results li .text {
@@ -66,7 +74,7 @@ li {
 
 #rightbar {
   float: right;
-  border-left: 1px solid #888;
+  border-left: 1px solid #ccc;
   padding: 6px;
   width: 163px;
 }
@@ -84,10 +92,12 @@ li {
 }
 
 #query, .edit_text {
-  width: 700px;
+  width: 693px;
   height: 70px;
   font-size: 16px;
-  border: 1px solid #666;
+  border: 1px solid #999;
+  -webkit-box-shadow: #eee 0px 0px 23px;
+  -moz-box-shadow: #eee 0px 0px 23px;
   margin: 0 0 5px 0;
   padding: 0 2px 0 2px;
 }
@@ -151,7 +161,7 @@ li .delete {
 
 #results li .options {
   position: absolute;
-  right: 0px;
+  right: 4px;
   top: 4px;
   width: 90px;
   /*background: url('/images/cog.png') no-repeat 10px 0;*/
