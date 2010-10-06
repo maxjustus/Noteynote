@@ -115,7 +115,7 @@ function parse_text(text) {
   }
 }
 
-$(document).ready(function() {
+$(function() {
   app.run();
 /*
   $(document).keyup(function(){
@@ -192,7 +192,7 @@ $(document).ready(function() {
     $('#view_all').hide();
     $('#search').hide();
     $('#edit-pk').html(hidden_pk_text);
-    $('#edit-cancel').html(cancel_button_text);
+    $('#edit-cancel').html(cancel_button_text).find('input').button();
     $('#post').attr('value', 'update');
     $('#query').focus();
     $(window).scrollTop('#query');
@@ -326,16 +326,96 @@ $(document).ready(function() {
     return false;
   });
 
-  /* autocomplete_tags = [];
+  availableTags = [];
   $('#tags .tag').each(function(){
-    autocomplete_tags.push($(this).html());
-  }); */
-  /* $('#query').autocomplete('/tags', {multiple: true, multipleSeparator: ' ', selectFirst: true, delay: 200, max: 1, width: 'auto', minChars: 3}); */
+    availableTags.push($(this).html());
+  });
+  /*$('#query').autocomplete('/tags', {multiple: true, multipleSeparator: ' ', selectFirst: true, delay: 200, max: 1, width: 'auto', minChars: 3});*/
 
   $('a[rel*=modal]').click(function(){
     modalBox(this);
     return false;
   });
+
+  function split( val ) {
+    return val.split( /[ \n]/ );
+  }
+  function extractLast( term ) {
+    return split( term ).pop();
+  }
+
+  function extractWordAt(text, offset) {
+    var word_start = offset - 1;
+    var word_end = offset - 1;
+
+    while(text[word_end] != ' ' && text[word_end] != '\n' && word_end < text.length) {
+      word_end++;
+    }
+
+    while(text[word_start - 1] != ' ' && text[word_start -1] != '\n' && word_start > 0) {
+      if(text[word_start] != undefined) {
+        word_start--;
+      }
+    }
+
+    var word = text.slice(word_start, word_end);
+
+    console.log(word);
+    console.log(word_start);
+    console.log(word_end);
+
+    return {word: word, start: word_start, end: word_end};
+  }
+
+  $("#query").autocomplete({
+    source: function( request, response ) {
+        // delegate back to autocomplete, but extract the last term
+
+        var word = extractWordAt( $('#query').val(), $('#query').caret().start).word;
+        if(word.indexOf('#') != -1) {
+          $.get('/tags', {q: word}, function(r){
+            if(r != '') {
+              var tag_array = r.split(',');
+              response(tag_array);
+            } else {
+              return false;
+            }
+          });
+        } else {
+          $('#query').autocomplete('close');
+          return false;
+        }
+        //response($.ui.autocomplete.filter(availableTags, extractWordAt( $('#query').val(), $('#query').caret().start).word));
+      },
+    focus: function() {
+            // prevent value inserted on focus
+            return false;
+          },
+    select: function( event, ui ) {
+            var old_value = this.value;
+            var word = extractWordAt(this.value, $(this).caret().start);
+            string_upto = old_value.substring(0, word.start);
+            console.log(word.start);
+            console.log(word.end);
+            string_after = old_value.substring(word.end, old_value.length);
+            new_value_upto = string_upto + ui.item.value;
+            new_value = new_value_upto + string_after;
+            this.value = new_value;
+            $(this).setCursorPosition(new_value_upto.length);
+            return false;
+          }
+  });
+
+  $('#query').keyup(function(e){
+    var word = extractWordAt( $('#query').val(), $('#query').caret().start).word;
+    if(word.indexOf('#') != -1 && e.which != 13) {
+      $('#query').autocomplete('enable');
+    } else {
+      $('#query').autocomplete('disable').autocomplete('close');
+    }
+  });
+
+  $('#search, #post, #cancel').button();
 
 /* end document.ready */
 });

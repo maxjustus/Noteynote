@@ -205,7 +205,7 @@ get '/tags' do
   end
   tag_connection.close
    
-  tags.collect { |tag| tag['tag'] }.join("\n")
+  tags.collect { |tag| tag['tag'] }.join(",")
 end
 
 get '/tags/:tag_pk/delete' do
