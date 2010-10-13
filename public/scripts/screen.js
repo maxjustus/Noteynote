@@ -133,32 +133,13 @@ $(function() {
     max: 4,
     step: 1,
     slide: function(event, ui){
-      hidePostsOlderThenSlider(ui.value);
       $.cookie('date-slider-value', ui.value, {expires: 7});
       fetchSliderVal();
+    },
+    change: function(event, ui){
+      hidePostsOlderThenSlider(ui.value);
     }
   });
-
-  function fetchSliderVal() {
-    //I know it's not as efficient to fetch this right after setting it, but it's more DRY
-    var slider_val = $.cookie('date-slider-value');
-    var value_text = 'All notes';
-    if(slider_val > 0) {
-      if(slider_val == 1) {
-        value_text = '1 week old';
-      } else {
-        value_text = slider_val + ' weeks old';
-      }
-    }
-
-    $('#date-slider-value').text(value_text);
-
-    if(slider_val == undefined) {
-      return 0;
-    } else {
-      return slider_val
-    }
-  }
 
   app.run();
 /*
@@ -471,17 +452,17 @@ function hidePostsOlderThenSlider(value) {
   limit = (d.getTime() / 1000) - value * 604800;
   $('#results li').each(function(){
     if (value == 0) {
-      $(this).show();
+      $(this).attr('style', '');
     } else {
       var id = $(this).attr('id');
       if(id != '') {
         var created_at = parseInt($(this).attr('id'));
-        console.log(created_at);
-        console.log(limit);
+        //console.log(created_at);
+        //console.log(limit);
         if (created_at > limit) {
-          $(this).show();
+          $(this).attr('style', '');
         } else {
-          $(this).hide();
+          $(this).css('display', 'none');
         }
       }
     }
@@ -532,6 +513,27 @@ function colorClassFromString(text) {
   }
 
   return (' color-' + total % 7);
+}
+
+function fetchSliderVal() {
+  //I know it's not as efficient to fetch this right after setting it, but it's more DRY
+  var slider_val = $.cookie('date-slider-value');
+  var value_text = 'All notes';
+  if(slider_val > 0) {
+    if(slider_val == 1) {
+      value_text = '1 week old';
+    } else {
+      value_text = slider_val + ' weeks old';
+    }
+  }
+
+  $('#date-slider-value').text(value_text);
+
+  if(slider_val == undefined) {
+    return 0;
+  } else {
+    return slider_val
+  }
 }
 
 /* from http://groups.google.com/group/jquery-en/browse_thread/thread/a890828a14d86737?pli=1 */
