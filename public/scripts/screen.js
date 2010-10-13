@@ -27,7 +27,8 @@ var app = $.sammy(function() { with(this) {
         $('.form-edit-content').remove();
         $('#post').attr('value', 'post');
         $('#search').show();
-        $('#view_all').show();
+        $('#date-slider-container').show();
+        $('.view_all').show();
         build_list(data);
         $('#query').val(query);
         $('#query').focus();
@@ -43,9 +44,19 @@ function build_list(data) {
   var archive_output = '<ul id="archive"><li class="toggle">Archived</li>';
   var archive_note_output = '';
   notes = data.notes;
+
+
+  var d = new Date();
+  var slider_val = $('#date-slider').slider('value');
+  date_limit = (d.getTime() / 1000) - slider_val * 604800;
+
   $.each(notes, function() {
-    note_output = ''
-    note_output += '<li>';
+    var note_style = '';
+    if (this.created_at_i < date_limit && slider_val != 0) {
+      note_style = 'display: none;';
+    }
+    var note_output = '';
+    note_output += '<li id="' + this.created_at_i + '-post" style="' + note_style + '" >';
     note_output += '<input type="hidden" class="note_pk" value="' + this.pk + '" />';
     note_output += '<div class="options">';
     note_output += '<a class="delete" href="/notes/' + this.pk + '/delete" ></a>';
@@ -116,6 +127,39 @@ function parse_text(text) {
 }
 
 $(function() {
+  $('#date-slider').slider({
+    value: fetchSliderVal(),
+    min: 0,
+    max: 4,
+    step: 1,
+    slide: function(event, ui){
+      hidePostsOlderThenSlider(ui.value);
+      $.cookie('date-slider-value', ui.value, {expires: 7});
+      fetchSliderVal();
+    }
+  });
+
+  function fetchSliderVal() {
+    //I know it's not as efficient to fetch this right after setting it, but it's more DRY
+    var slider_val = $.cookie('date-slider-value');
+    var value_text = 'All notes';
+    if(slider_val > 0) {
+      if(slider_val == 1) {
+        value_text = '1 week old';
+      } else {
+        value_text = slider_val + ' weeks old';
+      }
+    }
+
+    $('#date-slider-value').text(value_text);
+
+    if(slider_val == undefined) {
+      return 0;
+    } else {
+      return slider_val
+    }
+  }
+
   app.run();
 /*
   $(document).keyup(function(){
@@ -124,6 +168,8 @@ $(function() {
     $('#preview_pane').html(text);
   });
 */
+
+  $('#search, #post, #cancel').button();
 
   $('#query').expandable({duration: 0, interval: 100});
 
@@ -189,8 +235,9 @@ $(function() {
     previous_value = $('#query').val();
     $('#query').val(note_text);
 
-    $('#view_all').hide();
+    $('.view_all').hide();
     $('#search').hide();
+    $('#date-slider-container').hide();
     $('#edit-pk').html(hidden_pk_text);
     $('#edit-cancel').html(cancel_button_text).find('input').button();
     $('#post').attr('value', 'update');
@@ -200,8 +247,9 @@ $(function() {
     $('#bottom-buttons .cancel').click(function(){
       $('#query').val(previous_value);
       $('#post').attr('value', 'post');
-      $('#view_all').show();
+      $('.view_all').show();
       $('#search').show();
+      $('#date-slider-container').show();
       $('.form-edit-content').remove();
     });
     /*
@@ -415,10 +463,30 @@ $(function() {
     }
   });
 
-  $('#search, #post, #cancel').button();
-
 /* end document.ready */
 });
+
+function hidePostsOlderThenSlider(value) {
+  var d = new Date();
+  limit = (d.getTime() / 1000) - value * 604800;
+  $('#results li').each(function(){
+    if (value == 0) {
+      $(this).show();
+    } else {
+      var id = $(this).attr('id');
+      if(id != '') {
+        var created_at = parseInt($(this).attr('id'));
+        console.log(created_at);
+        console.log(limit);
+        if (created_at > limit) {
+          $(this).show();
+        } else {
+          $(this).hide();
+        }
+      }
+    }
+  });
+}
 
 function prettyDate(time) {
   var date = new Date(time || ""),
