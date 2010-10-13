@@ -4,6 +4,7 @@
     %script{:type => 'text/javascript', :src => 'http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js'}
     %script{:type => 'text/javascript', :src => 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js'}
     %script{:type => 'text/javascript', :src => '/scripts/jquery.caret.1.02.min.js'}
+    %script{:type => 'text/javascript', :src => '/scripts/jquery.cookie.js'}
     %script{:type => 'text/javascript', :src => '/scripts/sammy.js'}
     -#%script{:type => 'text/javascript', :src => '/scripts/jquery.autocomplete.js'}
     %script{:type => 'text/javascript', :src => '/scripts/jquery.expandable.js'}
@@ -32,15 +33,18 @@
           -#this needs to be replaced with a sammy form
           %form{:method => 'post', :action => '/notes', :id => 'note-form'}
             %textarea{'name' => 'note[body]', :id => 'query'}
+            #date-slider-container
+              #date-slider-value All notes
+              #date-slider
             #bottom-buttons
               %input{:type => 'submit', :value => 'search', :id => 'search'}
               %input{:type => 'button', :value => 'post', :id => 'post'}
-              %a{:href => '/', :id => 'view_all'} view all
+              %a{:href => '/', :class => 'view_all'} view all
               #edit-cancel
               #edit-pk
         -# #preview_pane
         #rightbar
-          %a{:href => '/', :id => 'view_all'} view all
+          %a{:href => '/', :class => 'view_all'} view all
           #tags
             %ul
               - @tags.each do |tag|

@@ -87,8 +87,8 @@ li {
   padding: 1px;
 }
 
-#view_all {
-  margin-right: 8px;
+#bottom-buttons .view_all {
+  margin-left: 2px;
 }
 
 #query, .edit_text {
@@ -188,10 +188,12 @@ li .delete {
 #main-loading-container {
   text-align: center;
   /* display: none; */
-  position: absolute;
-  bottom: 0;
+  position: fixed;
+  top: 0;
   right: 0;
   color: #888;
+  background: #fff;
+  padding: 10px;
 }
 
 .loading {
@@ -250,3 +252,27 @@ li .delete {
   margin-left: 25px;
 }
 
+
+#date-slider-container {
+  position: absolute;
+  bottom: 9px;
+  right: 0px;
+  background: url(/images/clock.png) no-repeat 0 0;
+  padding: 5px 5px 5px 20px;
+}
+
+#date-slider-container #date-slider-value {
+  font-size: 11px;
+  color: #888;
+  text-align: left;
+  padding-right: 16px;
+  line-height: 6px;
+  
+  margin:  0 0 0 0;
+  float: left;
+}
+
+#date-slider {
+  width: 75px;
+  float: left;
+}
