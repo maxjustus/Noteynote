@@ -44,9 +44,12 @@
               #edit-pk
         -# #preview_pane
         #rightbar
-          %a{:href => '/', :class => 'view_all'} view all
+          .option_links
+            %a{:href => '/', :class => 'view_all'} View all
+            %a{:href => '/', :id => 'toggle_tags_full_width'} Tags
           #tags
             %ul
+            -#%ul
               - @tags.each do |tag|
                 %li
                   %a{:class => 'delete tag-delete', :href => "/tags/#{tag[:pk]}/delete"}

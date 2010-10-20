@@ -1,4 +1,6 @@
 var tag_regexp = /(#[^ ]*)/g;
+var tag_list = [];
+var availableTags = [];
 
 var app = $.sammy(function() { with(this) {
   get('', function() { with(this){
@@ -24,6 +26,7 @@ var app = $.sammy(function() { with(this) {
       async: false,
       success: function(data){
         /* this stuff doesn't belong here... */
+        $('#rightbar').removeClass('full_width');
         $('.form-edit-content').remove();
         $('#post').attr('value', 'post');
         $('#search').show();
@@ -39,12 +42,14 @@ var app = $.sammy(function() { with(this) {
 }});
 
 function build_list(data) {
+  $('#tags ul').html('');
+  tag_list = [];
+  availableTags = [];
   $('#main-loading-container').hide();
   var results_output = '<ul id="current">';
   var archive_output = '<ul id="archive"><li class="toggle">Archived</li>';
   var archive_note_output = '';
   notes = data.notes;
-
 
   var d = new Date();
   var slider_val = $('#date-slider').slider('value');
@@ -72,10 +77,9 @@ function build_list(data) {
   });
   results_output += '</ul>';
   $('#results').html(results_output);
-  //if(archive_note_output != '') {
   archive_output += archive_note_output + '</ul>';
   $('#results').append(archive_output);
-  //}
+  build_tag_list();
 
   $('#results li').hover(function(){
     $(this).children('.options').show();
@@ -83,23 +87,21 @@ function build_list(data) {
   function(){
     $(this).children('.options').hide();
   });
-
-  /*$('#results li .options').toggle(function(){
-    $(this).children().show(100);
-    return true;
-  },
-  function(){
-    $(this).children().hide(100);
-    return true;
-  });*/
 }
 
 function build_tag_list(data) {
-  tags = data.tags;
+  //tags = data;
+  tag_list = tag_list.sort();
+  //new_tag_list = tag_list;
   var tags_output = '<ul>';
-  $.each(tags, function() {
-    tags_output += '<li>' + '<a class="delete tag-delete" href="/tags/' + this.pk + '/delete" ></a>' + '<a class="tag' + colorClassFromString(this.tag) + '" href="#/notes/' + this.tag + '" >' + this.tag + '</a>' + '</li>';
-  });
+  for(i = 0; i < tag_list.length; i++) {
+    tag = tag_list[i];
+    if (tag != tag_list[i - 1]) {
+      //tags_output += '<li>' + '<a class="delete tag-delete" href="/tags/' + tag + '/delete" ></a>' + '<a class="tag' + colorClassFromString(tag) + '" href="#/notes/' + tag + '" >' + tag + '</a>' + '</li>';
+      tags_output += '<li>' + '<a class="tag' + colorClassFromString(tag) + '" href="#/notes/' + tag + '" >' + tag + '</a>' + '</li>';
+      availableTags.push(tag);
+    }
+  }
   tags_output += '</ul>';
   $('#tags').html(tags_output);
 }
@@ -113,13 +115,15 @@ function parse_text(text) {
   '<a href="$&" class="my_link" target="_blank">$&</a>')
       .replace(/([^\/])(www[\S]+(\b|$))/gim,
   '$1<a href="http://$2" class="my_link" target="_blank">$2</a>');
-  } 
+  }
 
   function parse_tags(input) {
     /*fix for newlines */
     newlines_replaced_output = input.replace(/\n/gi, '<br />');
     tag_parsed_output = newlines_replaced_output.replace(tag_regexp, function(str, s1, offset, s) {
       /* mod 7 for 8 color variations */
+      tag_list.push(s1);
+      //$('#tags ul').append('<li>' + '<a class="delete tag-delete" href="/tags/' + s1 + '/delete" ></a>' + '<a class="tag' + colorClassFromString(s1) + '" href="#/notes/' + s1 + '" >' + s1 + '</a>' + '</li>');
       return ' <a class="tag' + colorClassFromString(s1) + '" href="#/notes/' + s1 + '">' + s1 + '</a>'
     });
     return tag_parsed_output;
@@ -142,13 +146,11 @@ $(function() {
   });
 
   app.run();
-/*
-  $(document).keyup(function(){
-    text = $('#query').val();
-    text = text.replace(/\* (.*)\n/gin, '<li><input type="checkbox"></input>$1</li>');
-    $('#preview_pane').html(text);
+
+  $('#toggle_tags_full_width').click(function(){
+    $('#rightbar').toggleClass('full_width');
+    return false;
   });
-*/
 
   $('#search, #post, #cancel').button();
 
@@ -355,10 +357,6 @@ $(function() {
     return false;
   });
 
-  availableTags = [];
-  $('#tags .tag').each(function(){
-    availableTags.push($(this).html());
-  });
   /*$('#query').autocomplete('/tags', {multiple: true, multipleSeparator: ' ', selectFirst: true, delay: 200, max: 1, width: 'auto', minChars: 3});*/
 
   $('a[rel*=modal]').click(function(){
@@ -389,9 +387,9 @@ $(function() {
 
     var word = text.slice(word_start, word_end);
 
-    console.log(word);
-    console.log(word_start);
-    console.log(word_end);
+    //console.log(word);
+    //console.log(word_start);
+    //console.log(word_end);
 
     return {word: word, start: word_start, end: word_end};
   }
@@ -402,14 +400,18 @@ $(function() {
 
         var word = extractWordAt( $('#query').val(), $('#query').caret().start).word;
         if(word.indexOf('#') != -1) {
-          $.get('/tags', {q: word}, function(r){
-            if(r != '') {
-              var tag_array = r.split(',');
-              response(tag_array);
-            } else {
-              return false;
-            }
-          });
+          if ((word.length == 1 || availableTags.fuzzy_has(word) == false) && (window.location.hash != '')) {
+            $.get('/tags', {q: word}, function(r){
+              if(r != '') {
+                var tag_array = r.split(',');
+                response(tag_array);
+              } else {
+                return false;
+              }
+            });
+          } else {
+            response($.ui.autocomplete.filter(availableTags, word));
+          }
         } else {
           $('#query').autocomplete('close');
           return false;
@@ -571,4 +573,25 @@ jQuery.fn.setCursorPosition = function(pos) {
     range.moveStart('character', pos);
     range.select();
   }
+}
+
+Array.prototype.has = function(v) {
+  for (var i = 0; i < this.length; i++){
+    if (this[i] == v) return i;
+  }
+
+  return false;
+}
+
+Array.prototype.fuzzy_has = function(v) {
+  v_regexp = eval('/' + v + '/gi');
+  for (var i = 0; i < this.length; i++){
+    console.log(this[i]);
+    if (v_regexp.test(this[i])) {
+      //return i;
+      return true;
+    }
+  }
+
+  return false;
 }
