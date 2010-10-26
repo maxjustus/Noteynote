@@ -1,4 +1,4 @@
-var tag_regexp = /(#[^ ]*)/g;
+var tag_regexp = /(?:[^\w]|^)(#[\w-_]*)/g;
 var tag_list = [];
 var availableTags = [];
 
@@ -9,7 +9,7 @@ var app = $.sammy(function() { with(this) {
     if (url !== null) {
       $.getJSON(
         $('#note-form').attr('action'),
-        {'q': $('#query').val()},
+        {'q': ''},
         build_list
       );
     }
@@ -121,8 +121,9 @@ function parse_text(text) {
     /*fix for newlines */
     newlines_replaced_output = input.replace(/\n/gi, '<br />');
     tag_parsed_output = newlines_replaced_output.replace(tag_regexp, function(str, s1, offset, s) {
-      /* mod 7 for 8 color variations */
-      tag_list.push(s1);
+      if(s1 != '#') {
+        tag_list.push(s1);
+      }
       //$('#tags ul').append('<li>' + '<a class="delete tag-delete" href="/tags/' + s1 + '/delete" ></a>' + '<a class="tag' + colorClassFromString(s1) + '" href="#/notes/' + s1 + '" >' + s1 + '</a>' + '</li>');
       return ' <a class="tag' + colorClassFromString(s1) + '" href="#/notes/' + s1 + '">' + s1 + '</a>'
     });

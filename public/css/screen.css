@@ -7,6 +7,8 @@ body {
 
 a {
   text-decoration: none;
+  color: #2786c2;
+  font-size: 13px;
 }
 
 a:hover {
@@ -60,6 +62,7 @@ li {
 }
 
 #results li .tag {
+  font-size: 14px;
 }
 
 #results li .created_at {
@@ -91,7 +94,7 @@ li {
 }
 
 #rightbar .view_all {
-  background: url('/images/sitemap.png') no-repeat 0 50%;
+  background: url('/images/house.png') no-repeat 0 50%;
   line-height: 25px;
   padding-left: 20px;
 }
@@ -120,6 +123,7 @@ li {
 #tags a.tag {
   display: block;
   padding: 1px;
+  font-size: 14px;
 }
 
 #rightbar.full_width #tags a.tag {

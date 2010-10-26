@@ -107,15 +107,16 @@ post '/notes' do
   tags.each do |tag|
     tag_connection.find_or_create_by_tag_and_owner(tag, current_user[:pk])
   end
-  query_tags = tag_connection.query do |q|
-    q.add 'user_pk', :numeq, current_user[:pk]
-    q.order_by 'created_at_i', :numdesc
-    q.limit 50
-  end
+  #query_tags = tag_connection.query do |q|
+  #  q.add 'user_pk', :numeq, current_user[:pk]
+  #  q.order_by 'created_at_i', :numdesc
+  #  q.limit 50
+  #end
 
   tag_connection.close
 
-  {'tags' => query_tags, 'note' => note}.to_json
+  #{'tags' => query_tags, 'note' => note}.to_json
+  {'note' => note}.to_json
 end
 
 get '/notes' do
