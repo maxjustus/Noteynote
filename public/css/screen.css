@@ -1,14 +1,14 @@
 body {
   padding: 0;
   margin: 0;
-  font-size: 14px;
+  font-size: 12px;
   font-family: "Lucida Grande", "Trebuchet MS", Arial, sans-serif;
 }
 
 a {
   text-decoration: none;
   color: #2786c2;
-  font-size: 13px;
+  font-size: 11px;
 }
 
 a:hover {
@@ -62,7 +62,7 @@ li {
 }
 
 #results li .tag {
-  font-size: 14px;
+  font-size: 11px;
 }
 
 #results li .created_at {
@@ -123,12 +123,12 @@ li {
 #tags a.tag {
   display: block;
   padding: 1px;
-  font-size: 14px;
+  font-size: 11px;
 }
 
 #rightbar.full_width #tags a.tag {
   display: inline-block;
-  font-size: 13px;
+  font-size: 11px;
 }
 
 #rightbar.full_width #tags {
@@ -202,7 +202,7 @@ li .delete {
   text-align: right;
   content: 'Archived';
   font-weight: bold;
-  font-size: 13px;
+  font-size: 12px;
   text-decoration: underline;
   border-top: none;
 }
