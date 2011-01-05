@@ -68,7 +68,7 @@ function build_list(data) {
     note_output += '<a class="edit" href="/notes" ></a>';
     note_output += '<a class="archive" href="/notes/' + this.pk + '/move" ></a>';
     note_output += '</div>';
-    note_output += '<span class="text">' + parse_text(this.body) + '</span>' + ' <span class="created_at">' + prettyDate(this.created_at) +'</span>' + '</li>';
+    note_output += '<pre class="text">' + parse_text(this.body) + '</span>' + ' <span class="created_at">' + prettyDate(this.created_at) +'</pre>' + '</li>';
     if(this.position == 0 || this.position == undefined) {
       results_output += note_output;
     } else {
